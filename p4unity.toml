@@ -1,0 +1,10 @@
+# configuration k:v                     # envvar override    # usage
+verbose_logs = false                    # P4U_VERBOSE        # enable to get verbose logs emitted next to p4d/p4s
+perforce_server = "localhost:1666"      # P4PORT             # p4 port to use
+bypass_keyphrase = "p4unity-bypass"     # P4U_BYPASS         # 
+
+# list of path prefixes to check 
+# eg. "//" or "//<your_depot>/" means every commit is going to be checked
+#     "//MyDepot/UnityProjects/" could filter it down to just the unity folder, for example
+#
+path_whitelist = [ "//" ]
