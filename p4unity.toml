@@ -1,6 +1,8 @@
 # configuration k:v                     # envvar override    # usage
 verbose_logs = false                    # P4U_VERBOSE        # enable to get verbose logs emitted next to p4d/p4s
-perforce_server = "localhost:1666"      # P4PORT             # p4 port to use
+perforce_server = "localhost:1666"      # P4U_SERVER         # p4 port to use
+perforce_user = "user"                  # P4U_USER           # user to login
+perforce_pass = "pwd"                   # P4U_PASS           # pass / token to use for user login
 bypass_keyphrase = "p4unity-bypass"     # P4U_BYPASS         # 
 
 # list of path prefixes to check 

@@ -19,7 +19,9 @@ import (
 
 type tomlConfig struct {
 	VerboseLogs     bool     `toml:"verbose_logs" env:"P4U_VERBOSE"`
-	PerforceServer  string   `toml:"perforce_server" env:"P4PORT"`
+	PerforceServer  string   `toml:"perforce_server" env:"P4U_SERVER"`
+	PerforceUser    string   `toml:"perforce_user" env:"P4U_USER"`
+	PerforcePass    string   `toml:"perforce_pass" env:"P4U_PASS"`
 	BypassKeyphrase string   `toml:"bypass_keyphrase" env:"P4U_BYPASS"`
 	PathWhitelist   []string `toml:"path_whitelist"`
 }

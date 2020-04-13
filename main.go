@@ -122,7 +122,15 @@ func filterStringsByType(s []string, p4type string) []string {
 //
 func fileExistsInDepot(depotPath string) (bool, error) {
 
-	cmd := exec.Command("p4", "-p", AppConfig.PerforceServer, "-s", "fstat", depotPath)
+	cmd := exec.Command(
+		"p4",
+		"-p", AppConfig.PerforceServer,
+		"-u", AppConfig.PerforceUser,
+		"-P", AppConfig.PerforcePass,
+		"-s",
+		"fstat",
+		depotPath,
+	)
 	fstatOut, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("[p4unity] failed to launch P4; %s\n%s\n\n", err, fstatOut)
@@ -163,7 +171,16 @@ func app() int {
 	}
 
 	// talk to p4, get the description of the given changelist
-	cmd := exec.Command("p4", "-p", AppConfig.PerforceServer, "-s", "describe", "-s", strconv.FormatInt(int64(changelist), 10))
+	cmd := exec.Command(
+		"p4",
+		"-p", AppConfig.PerforceServer,
+		"-u", AppConfig.PerforceUser,
+		"-P", AppConfig.PerforcePass,
+		"-s",
+		"describe",
+		"-s",
+		strconv.FormatInt(int64(changelist), 10),
+	)
 	p4out, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("[p4unity] failed to launch P4; %s\n%s\n\n", err, p4out)
