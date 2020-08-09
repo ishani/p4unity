@@ -85,6 +85,12 @@ var opsDel = stringSet{
 	"purge":       {},
 	"archive":     {},
 }
+var opsExists = stringSet{
+	"edit":     {},
+	"move/add": {},
+	"add":      {},
+	"import":   {},
+}
 
 // ----------------------------------------------------------------------------------------------------------
 // precompiled regular expressions used below
@@ -138,13 +144,20 @@ func fileExistsInDepot(depotPath string) (bool, error) {
 	}
 
 	fstatOutString := string(fstatOut)
+	zLog.Info("fstat", zap.String("out", fstatOutString))
+
 	fstatHeadAction := reFindHeadActionOp.FindStringSubmatch(fstatOutString)
 
 	if len(fstatHeadAction) == 0 {
+		zLog.Info("fstat", zap.String("failed", "regex fail"))
 		return false, nil
 	}
 
-	if !opsAdd.has(fstatHeadAction[1]) {
+	// check if the head action is appropriate; eg. add, edit - something that infers this file in the depot at this time
+	fstatHeadActionOp := fstatHeadAction[1]
+
+	if !opsExists.has(fstatHeadActionOp) {
+		zLog.Info("fstat", zap.String("ignored_action", fstatHeadActionOp))
 		return false, nil
 	}
 
@@ -247,7 +260,9 @@ func app() int {
 	}
 
 	filesBeingAdded := make(stringSet)
+	filesBeingAddedIgnoringCase := make(stringSet)
 	filesBeingDeleted := make(stringSet)
+	filesBeingDeletedIgnoringCase := make(stringSet)
 
 	for pi := 0; pi < p4fileCount; pi++ {
 
@@ -316,10 +331,12 @@ func app() int {
 		if opsAdd.has(vcsOperation) {
 			itemLog.Info("MarkedForAdd")
 			filesBeingAdded.add(filePath)
+			filesBeingAddedIgnoringCase.add(strings.ToLower(filePath))
 		}
 		if opsDel.has(vcsOperation) {
 			itemLog.Info("MarkedForDelete")
 			filesBeingDeleted.add(filePath)
+			filesBeingDeletedIgnoringCase.add(strings.ToLower(filePath))
 		}
 	}
 
@@ -338,6 +355,10 @@ func app() int {
 
 			// is the meta file coming in this changelist? that's nice
 			if filesBeingAdded.has(fileWithMeta) {
+				continue
+			}
+			// in ignore-case mode, also check the lowered list
+			if filesBeingAddedIgnoringCase.has(strings.ToLower(fileWithMeta)) {
 				continue
 			}
 
@@ -371,6 +392,10 @@ func app() int {
 			if filesBeingAdded.has(fileWithoutMeta) {
 				continue
 			}
+			// in ignore-case mode, also check the lowered list
+			if filesBeingAddedIgnoringCase.has(strings.ToLower(fileWithoutMeta)) {
+				continue
+			}
 
 			// if it's not in the changelist, is it already in the depot at time of commit?
 			foundInDepot, err := fileExistsInDepot(fileWithoutMeta)
@@ -400,6 +425,10 @@ func app() int {
 
 			// file's twin is being deleted as part of this CL, all is well
 			if filesBeingDeleted.has(fileWithMeta) {
+				continue
+			}
+			// in ignore-case mode, also check the lowered list
+			if filesBeingDeletedIgnoringCase.has(strings.ToLower(fileWithMeta)) {
 				continue
 			}
 

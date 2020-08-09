@@ -19,6 +19,7 @@ import (
 
 type tomlConfig struct {
 	VerboseLogs     bool     `toml:"verbose_logs" env:"P4U_VERBOSE"`
+	CaseSensitive   bool     `toml:"case_sensitive" env:"P4U_CASE_SENSITIVE"`
 	PerforceServer  string   `toml:"perforce_server" env:"P4U_SERVER"`
 	PerforceUser    string   `toml:"perforce_user" env:"P4U_USER"`
 	PerforcePass    string   `toml:"perforce_pass" env:"P4U_PASS"`
